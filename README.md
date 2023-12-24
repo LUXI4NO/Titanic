@@ -69,8 +69,8 @@ pip install -r requirements.txt
 ---
 
 # Power BI
-Puedes acceder al informe de Power BI a través del siguiente enlace:
-[Dashboard Titanic - Power BI](https://github.com/LUXI4NO/Power-BI/blob/main/Dashboard%20Titanic.pbix)
+
+Puedes acceder al informe de Power BI a través del siguiente enlace: [Dashboard Titanic - Power BI](https://github.com/LUXI4NO/Power-BI/blob/main/Dashboard%20Titanic.pbix)
 
 ## Instrucciones de Uso
 
@@ -81,6 +81,7 @@ Puedes acceder al informe de Power BI a través del siguiente enlace:
 ## Capturas de Pantalla
 
 ![Dashboard Titanic](https://github.com/LUXI4NO/Power-BI/assets/140111840/55bcf1d7-139b-4df6-adc8-bca889facd44)
+
 
 
 # Autor
