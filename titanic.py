@@ -44,16 +44,30 @@ with st.container():
 
     # Tabla de resultados
     tabla_resultados = pd.DataFrame({
-        "Categoría": ["Sobrevivientes", "Fallecidos"],
+        "Categoría": ["Sobrevivientes",'Fallecidos'],
         "Total": [total_sobrevivientes, total_muertos],
-        "Porcentaje": [f"{porcentaje_sobrevivientes}%", f"{porcentaje_muertos}%"],
-        "Edad Promedio": [f"{edad_promedio_sobrevivientes} años", f"{edad_promedio_fallecidos} años"],
-        "Desviación Estándar Edad": [f"{desviacion_estandar_sobrevivientes} años", f"{desviacion_estandar_fallecidos} años"]
+        "Porsentaje": [porcentaje_sobrevivientes, porcentaje_muertos],
+        "Promedio Edad": [edad_promedio_sobrevivientes, edad_promedio_fallecidos],
+        "Desviacion": [desviacion_estandar_sobrevivientes, desviacion_estandar_fallecidos]
     })
 
     # Mostrar tabla de resultados sin índice
-    st.table(tabla_resultados.set_index('Categoría', drop=True))
-    
+    st.table(tabla_resultados.set_index('Categoría', drop=True).style 
+        .set_properties(**{'text-align': 'center', 'font-size': '18px'})
+        .bar(subset=['Total', 'Porsentaje', 'Promedio Edad', 'Desviacion'], color='#83B7E2')
+        .highlight_max(axis=0, color='#ECF3FD')
+        .format({'Total': '{:.0f}', 'Porsentaje': '{:.0f}%', 'Promedio Edad': '{:.0f}%', 'Desviacion': '{:.0f}'})
+        .set_table_styles([
+                {'selector': 'th', 'props': [('background-color', '#ECF3FD'), ('color', '#000000'),
+                                              ('font-size', '18px'), ('border', '1px solid #000000')]},
+                {'selector': 'td', 'props': [('border', '1px solid #000000'), ('color', 'black')]},  # Añadido color negro
+                {'selector': 'tr:hover', 'props': [('background-color', '#000000')]},
+                {'selector': 'tr:nth-child(even)', 'props': [('background-color', '#EDF3FD')]},
+                {'selector': 'tr:nth-child(odd)', 'props': [('background-color', '#EDF3FD')]},
+                {'selector': 'td:hover', 'props': [('background-color', '#3580E9'), ('color', 'White')]}
+             ])
+)
+
     with st.container():
         # Filtro interactivo para la edad
         edad_filtro = st.slider("Seleccionar Rango de Edad", int(df['Age'].min()), int(df['Age'].max()), (int(df['Age'].min()), int(df['Age'].max())))
@@ -73,8 +87,8 @@ with st.container():
                     alt.Y("count():Q", title="Cantidad de Pasajeros", axis=alt.Axis(grid=False)),
                     alt.Color("Survived:N", title="Sobrevivientes", scale=alt.Scale(domain=[0, 1], range=['#25549C','#83B7E2']))
                 )
-                .properties(width=780,height=470,title='Gráfico de Barras - Rango de edad y Supervivencia')
-                .configure_legend(disable=True)
+                .properties(width=700,height=400,title='Gráfico de Barras - Rango de edad y Supervivencia')
+
             )
 
             # Mostrar el gráfico en Streamlit
@@ -90,12 +104,12 @@ with st.container():
                     tooltip=[alt.Tooltip('count()', title='Cantidad de Pasajeros'), alt.Tooltip('Survived:N',  title='Sobrevivientes'), alt.Tooltip('Sex:N', title='Sexo')]
                 )
                 .properties(
-                    width=700,
-                    height=470,
+                    width=600,
+                    height=400,
                     title='Gráfico de Barras - Cantidad de pasajeros y Supervivencia'
                 )
                 .configure_axis(grid=False)
-                .configure_legend(disable=True)
+                .configure_legend(orient='left')
                 .configure_axisY(orient='right')
             )
             # Mostrar el gráfico en Streamlit
@@ -110,28 +124,41 @@ with st.container():
     st.markdown("<p style='text-align: center;'>Mostrare la relación entre la clase socioeconómica, las tasas de supervivencia de los pasajeros del Titanic. Proporciona visualizaciones intuitivas y filtros interactivos para explorar patrones significativos y obtener una visión profunda de la demografía a bordo del famoso barco. Los gráficos de barras presentados muestran de manera clara y atractiva cómo estos factores se entrelazan, permitiendo a los usuarios explorar y entender mejor los datos históricos del Titanic.</p>", unsafe_allow_html=True)
 
 
+    # Cálculos previos
     total_pasajeros = len(df)
     total_por_clase = df.groupby('Pclass').size()
     supervivientes_por_clase = df[df['Survived'] == 1].groupby('Pclass').size()
     Fallecidos_por_clase = df[df['Survived'] == 0].groupby('Pclass').size()
+
+    # Cálculo de porcentajes
+    porcentaje_supervivientes = (supervivientes_por_clase / total_por_clase * 100)
+    porcentaje_fallecidos = (Fallecidos_por_clase / total_por_clase * 100)
 
     # Creación de un DataFrame con los resultados
     tabla_resultados = pd.DataFrame({
         "Categoría": ["Primera Clase", "Segunda Clase", "Tercera Clase"],
         "Total": total_por_clase.values,
         "Supervivientes": supervivientes_por_clase.values,
-        "Fallecidos": Fallecidos_por_clase.values
+        "Fallecidos": Fallecidos_por_clase.values,
+        "Porcentaje Supervivientes": porcentaje_supervivientes,
+        "Porcentaje Fallecidos": porcentaje_fallecidos,
     })
 
-    # Cálculo de porcentajes y adición al DataFrame
-    tabla_resultados["Porcentaje Total"] = (tabla_resultados["Total"] / total_pasajeros * 100).map('{:.0f}%'.format)
-    tabla_resultados["Porcentaje Supervivientes"] = (
-            tabla_resultados["Supervivientes"] / tabla_resultados["Total"] * 100).map('{:.0f}%'.format)
-    tabla_resultados["Porcentaje Fallecidos"] = (
-            tabla_resultados["Fallecidos"] / tabla_resultados["Total"] * 100).map('{:.0f}%'.format)
-
     # Visualización de resultados en forma de tabla
-    st.table(tabla_resultados.set_index('Categoría', drop=True))
+    st.table(tabla_resultados.set_index('Categoría', drop=True).style 
+        .set_properties(**{'text-align': 'center', 'font-size': '18px'})
+        .bar(subset=['Total', 'Supervivientes', 'Fallecidos', 'Porcentaje Supervivientes','Porcentaje Fallecidos'], color='#83B7E2')
+        .highlight_max(axis=0, color='#ECF3FD')
+        .format({'Total': '{:.0f}', 'Supervivientes': '{:.0f}', 'Fallecidos': '{:.0f}', 'Porcentaje Supervivientes': '{:.0f}%', 'Porcentaje Fallecidos': '{:.0f}%'})
+        .set_table_styles([
+                {'selector': 'th', 'props': [('background-color', '#ECF3FD'), ('color', '#000000'),
+                                              ('font-size', '15px'), ('border', '1px solid #000000')]},
+                {'selector': 'td', 'props': [('border', '1px solid #000000'), ('color', 'black')]},  # Añadido color negro
+                {'selector': 'tr:hover', 'props': [('background-color', '#000000')]},
+                {'selector': 'tr:nth-child(even)', 'props': [('background-color', '#EDF3FD')]},
+                {'selector': 'tr:nth-child(odd)', 'props': [('background-color', '#EDF3FD')]},
+                {'selector': 'td:hover', 'props': [('background-color', '#3580E9'), ('color', 'White')]}
+             ]))
 
     with st.container():
         selected_class = st.multiselect("Seleccionar Clase", sorted(df['Pclass'].unique()))
@@ -157,7 +184,7 @@ with st.container():
                         alt.Tooltip('Survived:N', title='Survived'),
                         alt.Tooltip('Pclass:N', title='Clases')]
                 )
-                .properties(title='Gráfico de Barras - Clases y Supervivencia',width=800,height=400)
+                .properties(title='Gráfico de Barras - Clases y Supervivencia',width=700,height=400)
                 .configure_axis(grid=False)
                 .configure_axisY(orient='right')
                 .configure_legend(orient='left')
@@ -175,7 +202,7 @@ with st.container():
                         alt.Tooltip('count()', title='Cantidad de Pasajeros'),
                         alt.Tooltip('Pclass:N', title='Clases')]
                         )
-                .properties(title='Gráfico de Barras - Clases y Cantidad de Pasajeros',width=800,height=400)
+                .properties(title='Gráfico de Barras - Clases y Cantidad de Pasajeros',width=700,height=400)
                 .configure_axis(grid=False)
                 .configure_legend(orient='right')
             )
@@ -209,19 +236,24 @@ with st.container():
         })
 
         # Calcular porcentajes
-        tabla_resultados["Porcentaje Total"] = (tabla_resultados["Total de Pasajeros"] / total_pasajeros) * 100
         tabla_resultados["Porcentaje Supervivientes"] = (tabla_resultados["Supervivientes"] / tabla_resultados["Total de Pasajeros"]) * 100
         tabla_resultados["Porcentaje Fallecidos"] = (tabla_resultados["Fallecidos"] / tabla_resultados["Total de Pasajeros"]) * 100
 
         # Mostrar la tabla de resultados con formato
-        st.table(tabla_resultados.set_index('Cabinas', drop=True).style.format({
-            "Total de Pasajeros": "{:.0f}",
-            "Supervivientes": "{:.0f}",
-            "Fallecidos": "{:.0f}",
-            "Porcentaje Total": "{:.0f}%",
-            "Porcentaje Supervivientes": "{:.0f}%",
-            "Porcentaje Fallecidos": "{:.0f}%"
-        }))
+        st.table(tabla_resultados.set_index('Cabinas', drop=True).style 
+        .set_properties(**{'text-align': 'center', 'font-size': '18px'})
+        .bar(subset=['Total de Pasajeros', 'Supervivientes','Fallecidos', 'Porcentaje Supervivientes','Porcentaje Fallecidos'], color='#83B7E2')
+        .highlight_max(axis=0, color='#ECF3FD')
+        .format({'Total de Pasajeros': '{:.0f}', 'Supervivientes': '{:.0f}', 'Fallecidos': '{:.0f}','Porcentaje Supervivientes': '{:.0f}%', 'Porcentaje Fallecidos': '{:.0f}%'})
+        .set_table_styles([
+                {'selector': 'th', 'props': [('background-color', '#ECF3FD'), ('color', '#000000'),
+                                              ('font-size', '15px'), ('border', '1px solid #000000')]},
+                {'selector': 'td', 'props': [('border', '1px solid #000000'), ('color', 'black')]},  # Añadido color negro
+                {'selector': 'tr:hover', 'props': [('background-color', '#000000')]},
+                {'selector': 'tr:nth-child(even)', 'props': [('background-color', '#EDF3FD')]},
+                {'selector': 'tr:nth-child(odd)', 'props': [('background-color', '#EDF3FD')]},
+                {'selector': 'td:hover', 'props': [('background-color', '#3580E9'), ('color', 'White')]}
+             ]))
 
         # Contenedor del Gráfico
         with st.container():
@@ -255,26 +287,32 @@ with st.container():
 
     # Crear un DataFrame con los resultados
     tabla_resultados = pd.DataFrame({
-        "Lugar de Embarque": ["Southampton", "Cherburgo", "Queenstown"],
+        "Categoria": ["Southampton", "Cherburgo", "Queenstown"],
         "Total de Pasajeros": total_por_clase.values,
         "Supervivientes": supervivientes_por_clase.values,
         "Fallecidos": fallecidos_por_clase.values
     })
 
     # Calcular porcentajes
-    tabla_resultados["Porcentaje Total"] = (tabla_resultados["Total de Pasajeros"] / total_pasajeros) * 100
     tabla_resultados["Porcentaje Supervivientes"] = (tabla_resultados["Supervivientes"] / tabla_resultados["Total de Pasajeros"]) * 100
     tabla_resultados["Porcentaje Fallecidos"] = (tabla_resultados["Fallecidos"] / tabla_resultados["Total de Pasajeros"]) * 100
 
     # Mostrar la tabla de resultados con formato
-    st.table(tabla_resultados.set_index('Lugar de Embarque', drop=True).style.format({
-        "Total de Pasajeros": "{:,}",
-        "Supervivientes": "{:,}",
-        "Fallecidos": "{:,}",
-        "Porcentaje Total": "{:.0f}%",
-        "Porcentaje Supervivientes": "{:.0f}%",
-        "Porcentaje Fallecidos": "{:.0f}%"
-    }))
+    st.table(tabla_resultados.set_index('Categoria', drop=True).style 
+        .set_properties(**{'text-align': 'center', 'font-size': '18px'})
+        .bar(subset=['Total de Pasajeros','Supervivientes','Fallecidos', 'Porcentaje Supervivientes','Porcentaje Fallecidos'], color='#83B7E2')
+        .highlight_max(axis=0, color='#ECF3FD')
+        .format({'Total de Pasajeros': '{:.0f}', 'Supervivientes': '{:.0f}', 'Fallecidos': '{:.0f}','Porcentaje Supervivientes': '{:.0f}%', 'Porcentaje Fallecidos': '{:.0f}%'})
+        .set_table_styles([
+                {'selector': 'th', 'props': [('background-color', '#ECF3FD'), ('color', '#000000'),
+                                              ('font-size', '15px'), ('border', '1px solid #000000')]},
+                {'selector': 'td', 'props': [('border', '1px solid #000000'), ('color', 'black')]},  # Añadido color negro
+                {'selector': 'tr:hover', 'props': [('background-color', '#000000')]},
+                {'selector': 'tr:nth-child(even)', 'props': [('background-color', '#EDF3FD')]},
+                {'selector': 'tr:nth-child(odd)', 'props': [('background-color', '#EDF3FD')]},
+                {'selector': 'td:hover', 'props': [('background-color', '#3580E9'), ('color', 'White')]}
+             ]))
+
     with st.container():
         selected_class = st.multiselect("Seleccionar embarque", sorted(map(str, df['Embarked'].unique())))
 
@@ -364,7 +402,20 @@ with st.container():
     })
 
     # Mostrar la tabla de resultados filtrada
-    st.table(tabla_resultados.set_index('Categoría', drop=True))
+    st.table(tabla_resultados.set_index('Categoría', drop=True).style 
+        .set_properties(**{'text-align': 'center', 'font-size': '18px'})
+        .bar(subset=['Total Pasajeros','Tarifa Total','Tarifa Promedio', 'Tarifa Máxima', 'Tarifa Mínima'], color='#83B7E2')
+        .highlight_max(axis=0, color='#ECF3FD')
+        .format({'Total Pasajeros': '{:.0f}', 'Tarifa Total': '{:.0f}$', 'Tarifa Promedio': '{:.0f}%', 'Tarifa Máxima': '{:.0f}$','Tarifa Mínima': '{:.0f}$'})
+        .set_table_styles([
+                {'selector': 'th', 'props': [('background-color', '#ECF3FD'), ('color', '#000000'),
+                                              ('font-size', '15px'), ('border', '1px solid #000000')]},
+                {'selector': 'td', 'props': [('border', '1px solid #000000'), ('color', 'black')]},  # Añadido color negro
+                {'selector': 'tr:hover', 'props': [('background-color', '#000000')]},
+                {'selector': 'tr:nth-child(even)', 'props': [('background-color', '#EDF3FD')]},
+                {'selector': 'tr:nth-child(odd)', 'props': [('background-color', '#EDF3FD')]},
+                {'selector': 'td:hover', 'props': [('background-color', '#3580E9'), ('color', 'White')]}
+             ]))
     # Agregar un slider para filtrar por valores de Fare
 
     fare_slider = st.slider("Seleccionar rango de tarifas", float(df['Fare'].min()), float(df['Fare'].max()), (float(df['Fare'].min()), float(df['Fare'].max())))
