@@ -80,6 +80,7 @@ with st.container():
         columna_edad, columna_sobrevivientes = st.columns((3, 2))
 
         with columna_edad:
+            interval = alt.selection_single(encodings=['color'])
             # Ajustar el gráfico de Altair para la edad y la supervivencia
             grafico_edad_sobrevivencia = (
                 alt.Chart(df_filtrado).mark_bar().encode(
@@ -88,13 +89,16 @@ with st.container():
                     alt.Color("Survived:N", title="Sobrevivientes", scale=alt.Scale(domain=[0, 1], range=['#25549C','#83B7E2']))
                 )
                 .properties(width=700,height=400,title='Gráfico de Barras - Rango de edad y Supervivencia')
+                .add_selection(interval)
+                .transform_filter(interval)
 
             )
 
             # Mostrar el gráfico en Streamlit
-            st.altair_chart(grafico_edad_sobrevivencia)
+            st.altair_chart(grafico_edad_sobrevivencia, use_container_width=True)
 
         with columna_sobrevivientes:
+            interval = alt.selection_single(encodings=['color'])
             # Ajustar el gráfico de Altair para el género y la supervivencia
             grafico_genero_sobrevivencia = (
                 alt.Chart(df_filtrado).mark_bar().encode(
@@ -103,17 +107,15 @@ with st.container():
                     color=alt.Color("Sex:N", title="Género", scale=alt.Scale(domain=['female', 'male'], range=['#25549C','#83B7E2'])),
                     tooltip=[alt.Tooltip('count()', title='Cantidad de Pasajeros'), alt.Tooltip('Survived:N',  title='Sobrevivientes'), alt.Tooltip('Sex:N', title='Sexo')]
                 )
-                .properties(
-                    width=600,
-                    height=400,
-                    title='Gráfico de Barras - Cantidad de pasajeros y Supervivencia'
-                )
+                .properties(width=700,height=400,title='Gráfico de Barras - Cantidad de pasajeros y Supervivencia')
                 .configure_axis(grid=False)
                 .configure_legend(orient='left')
                 .configure_axisY(orient='right')
+                .add_selection(interval)
+                .transform_filter(interval)
             )
             # Mostrar el gráfico en Streamlit
-            st.altair_chart(grafico_genero_sobrevivencia)
+            st.altair_chart(grafico_genero_sobrevivencia, use_container_width=True)
 
 
 st.write("##")
@@ -174,6 +176,7 @@ with st.container():
         columna_derecha, columna_izquierda = st.columns((2, 2))
         # Gráfico de barras - Clases y Supervivencia
         with columna_izquierda:
+            interval = alt.selection_single(encodings=['color'])
             chart_clase_supervivencia = (
                 alt.Chart(df_filtered).mark_bar().encode(
                     alt.Y('Pclass:N', title='Clases', axis=alt.Axis(labelAngle=0)),
@@ -188,11 +191,14 @@ with st.container():
                 .configure_axis(grid=False)
                 .configure_axisY(orient='right')
                 .configure_legend(orient='left')
+                .add_selection(interval)
+                .transform_filter(interval)
             )
-            st.altair_chart(chart_clase_supervivencia)
+            st.altair_chart(chart_clase_supervivencia, use_container_width=True)
 
         # Gráfico de barras - Clases y Cantidad de Pasajeros
         with columna_derecha:
+            interval = alt.selection_single(encodings=['color'])
             chart_clase_supervivencia_bar = (
                 alt.Chart(df_filtered).mark_bar().encode(
                     alt.Y('Pclass:N', title='Clases'), 
@@ -205,8 +211,10 @@ with st.container():
                 .properties(title='Gráfico de Barras - Clases y Cantidad de Pasajeros',width=700,height=400)
                 .configure_axis(grid=False)
                 .configure_legend(orient='right')
+                .add_selection(interval)
+                .transform_filter(interval)
             )
-            st.altair_chart(chart_clase_supervivencia_bar)
+            st.altair_chart(chart_clase_supervivencia_bar, use_container_width=True)
 
 st.write("##")
 st.write("##")
@@ -257,6 +265,7 @@ with st.container():
 
         # Contenedor del Gráfico
         with st.container():
+            interval = alt.selection_single(encodings=['color'])
             # Gráfico de barras de supervivencia por nivel de cabina
             chart_cabinas_supervivencia = (
                 alt.Chart(df_con_cabina_filtrado).mark_bar().encode(
@@ -266,10 +275,12 @@ with st.container():
                 )
                 .properties(width=1600, height=400, title='Gráfico de Barras - Cabinas y supervivencia')
                 .configure_axis(grid=False)
+                .add_selection(interval)
+                .transform_filter(interval)
             )
 
             # Mostrar el gráfico de barras
-            st.altair_chart(chart_cabinas_supervivencia)
+            st.altair_chart(chart_cabinas_supervivencia, use_container_width=True)
 
 st.write("##")
 st.write("##")
@@ -327,6 +338,8 @@ with st.container():
 
         # Gráfico de Barras - Lugar de Embarque y Cantidad de Pasajeros
         with columna_izquierda:
+            interval = alt.selection_single(encodings=['color'])
+
             chart_embarked_supervivencia = (
                 alt.Chart(df_filtered)
                 .mark_bar()
@@ -339,19 +352,18 @@ with st.container():
                         alt.Tooltip('Embarked:N', title='Lugar de Embarque')
                     ]
                 )
-                .properties(
-                    width=800,
-                    height=400,
-                    title='Gráfico de Barras - Embarques y Cantidad de Pasajeros'
-                )
+                .properties(width=700,height=400,title='Gráfico de Barras - Embarques y Cantidad de Pasajeros')
                 .configure_axis(grid=False)
                 .configure_axisY(orient='right')
                 .configure_legend(orient='left')
+                .add_selection(interval)
+                .transform_filter(interval)
             )
-            st.altair_chart(chart_embarked_supervivencia)
+            st.altair_chart(chart_embarked_supervivencia, use_container_width=True)
 
         # Gráfico de Barras - Lugar de Embarque y Supervivencia
         with columna_derecha:
+            interval = alt.selection_single(encodings=['color'])
             chart_clase_supervivencia = (
                 alt.Chart(df_filtered).mark_bar().encode(
                     alt.X('Embarked:N', title='Clases', axis=alt.Axis(labelAngle=0)),
@@ -363,11 +375,13 @@ with st.container():
                         alt.Tooltip('Embarked:N', title='Embarque'),
                     ]
                 )
-                .properties(width=800,height=400,title='Gráfico de Barras - Embarques y Supervivencia')
+                .properties(width=700,height=400,title='Gráfico de Barras - Embarques y Supervivencia')
                 .configure_legend(orient='right')
                 .configure_axis(grid=False)
+                .add_selection(interval)
+                .transform_filter(interval)
             )
-            st.altair_chart(chart_clase_supervivencia)
+            st.altair_chart(chart_clase_supervivencia, use_container_width=True)
 
 with st.container():
     st.markdown("<h1 style='text-align: center;'>Relación entre la Tarifa del Boleto y la Supervivencia en el Titanic</h1>", unsafe_allow_html=True)
@@ -423,6 +437,7 @@ with st.container():
     # Filtrar el DataFrame en función del rango seleccionado
     filtered_df = df[(df['Fare'] >= fare_slider[0]) & (df['Fare'] <= fare_slider[1])]
 
+    interval = alt.selection_single(encodings=['color'])
     # Gráfico de dispersión con el DataFrame filtrado
     correlacion_chart = (
         alt.Chart(filtered_df).mark_circle(size=85).encode(
@@ -432,11 +447,13 @@ with st.container():
             tooltip=[alt.Tooltip('count()', title='Cantidad de Pasajeros'), alt.Tooltip('Survived:N', title='Sobrevivientes'), alt.Tooltip('Fare', title='Precio del Boleto')]
         )
         .properties(width=1600, height=400)
+        .add_selection(interval)
+        .transform_filter(interval)
         .interactive()
     )
 
     # Mostrar el gráfico en Streamlit
-    st.altair_chart(correlacion_chart)
+    st.altair_chart(correlacion_chart, use_container_width=True)
 
 
 st.write("---")
