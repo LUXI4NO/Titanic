@@ -1,6 +1,6 @@
 # Análisis de Datos del Titanic
 
-[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://analystitanic.streamlit.app/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://datatitanic.streamlit.app/)
 [![Python Version](https://img.shields.io/badge/Python-3.7%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 ![image](https://github.com/LUXI4NO/Titanic/assets/140111840/6aca6568-9f11-45c1-b2b6-fdb4aa5a94d1)
